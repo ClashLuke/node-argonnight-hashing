@@ -9,7 +9,7 @@
     "license": "GPL-3.0-or-later",
     "repository": {
         "type": "git",
-        "url": "https://github.com/MoneroOcean/node-cryptonight-hashing.git"
+        "url": "https://github.com//ClashLuke/node-argonnight-hashing.git"
     },
     "dependencies": {
         "bindings": "*",
