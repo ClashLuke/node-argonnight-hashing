@@ -31,8 +31,6 @@
 #include "common/crypto/keccak.h"
 #include "common/utils/mm_malloc.h"
 #include "crypto/CryptoNight.h"
-#include "crypto/CryptoNight_constants.h"
-#include "crypto/CryptoNight_monero.h"
 #include "crypto/soft_aes.h"
 
 

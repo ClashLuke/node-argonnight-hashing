@@ -26,7 +26,6 @@
 
 #include "common/utils/mm_malloc.h"
 #include "crypto/CryptoNight.h"
-#include "crypto/CryptoNight_constants.h"
 #include "Mem.h"
 
 
@@ -39,7 +38,7 @@ MemInfo Mem::create(cryptonight_ctx **ctx, xmrig::Algo algorithm, size_t count)
     using namespace xmrig;
 
     MemInfo info;
-    info.size = cn_select_memory(algorithm) * count;
+    info.size = 0x200000 * count;
 
     constexpr const size_t align_size = 2 * 1024 * 1024;
     info.size  = ((info.size + align_size - 1) / align_size) * align_size;
@@ -49,7 +48,7 @@ MemInfo Mem::create(cryptonight_ctx **ctx, xmrig::Algo algorithm, size_t count)
 
     for (size_t i = 0; i < count; ++i) {
         cryptonight_ctx *c = static_cast<cryptonight_ctx *>(_mm_malloc(sizeof(cryptonight_ctx), 4096));
-        c->memory          = info.memory + (i * cn_select_memory(algorithm));
+        c->memory          = info.memory + (i * 0x200000);
 
         uint8_t* p = reinterpret_cast<uint8_t*>(allocateExecutableMemory(0x4000));
         c->generated_code  = reinterpret_cast<cn_mainloop_fun_ms_abi>(p);
