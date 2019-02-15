@@ -248,23 +248,6 @@ static inline void cn_explode_scratchpad(const __m128i *input, __m128i *output)
     xin6 = _mm_load_si128(input + 10);
     xin7 = _mm_load_si128(input + 11);
 
-    if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {
-        for (size_t i = 0; i < 16; i++) {
-            aes_round<SOFT_AES>(k0, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-            aes_round<SOFT_AES>(k1, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-            aes_round<SOFT_AES>(k2, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-            aes_round<SOFT_AES>(k3, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-            aes_round<SOFT_AES>(k4, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-            aes_round<SOFT_AES>(k5, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-            aes_round<SOFT_AES>(k6, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-            aes_round<SOFT_AES>(k7, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-            aes_round<SOFT_AES>(k8, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-            aes_round<SOFT_AES>(k9, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
-
-            mix_and_propagate(xin0, xin1, xin2, xin3, xin4, xin5, xin6, xin7);
-        }
-    }
-
     for (size_t i = 0; i < MEM / sizeof(__m128i); i += 8) {
         aes_round<SOFT_AES>(k0, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
         aes_round<SOFT_AES>(k1, &xin0, &xin1, &xin2, &xin3, &xin4, &xin5, &xin6, &xin7);
@@ -327,51 +310,6 @@ static inline void cn_implode_scratchpad(const __m128i *input, __m128i *output)
         aes_round<SOFT_AES>(k7, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
         aes_round<SOFT_AES>(k8, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
         aes_round<SOFT_AES>(k9, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-
-        if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {
-            mix_and_propagate(xout0, xout1, xout2, xout3, xout4, xout5, xout6, xout7);
-        }
-    }
-
-    if (ALGO == xmrig::CRYPTONIGHT_HEAVY) {
-        for (size_t i = 0; i < MEM / sizeof(__m128i); i += 8) {
-            xout0 = _mm_xor_si128(_mm_load_si128(input + i + 0), xout0);
-            xout1 = _mm_xor_si128(_mm_load_si128(input + i + 1), xout1);
-            xout2 = _mm_xor_si128(_mm_load_si128(input + i + 2), xout2);
-            xout3 = _mm_xor_si128(_mm_load_si128(input + i + 3), xout3);
-            xout4 = _mm_xor_si128(_mm_load_si128(input + i + 4), xout4);
-            xout5 = _mm_xor_si128(_mm_load_si128(input + i + 5), xout5);
-            xout6 = _mm_xor_si128(_mm_load_si128(input + i + 6), xout6);
-            xout7 = _mm_xor_si128(_mm_load_si128(input + i + 7), xout7);
-
-            aes_round<SOFT_AES>(k0, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k1, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k2, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k3, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k4, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k5, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k6, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k7, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k8, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k9, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-
-            mix_and_propagate(xout0, xout1, xout2, xout3, xout4, xout5, xout6, xout7);
-        }
-
-        for (size_t i = 0; i < 16; i++) {
-            aes_round<SOFT_AES>(k0, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k1, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k2, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k3, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k4, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k5, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k6, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k7, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k8, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-            aes_round<SOFT_AES>(k9, &xout0, &xout1, &xout2, &xout3, &xout4, &xout5, &xout6, &xout7);
-
-            mix_and_propagate(xout0, xout1, xout2, xout3, xout4, xout5, xout6, xout7);
-        }
     }
 
     _mm_store_si128(output + 4, xout0);
@@ -393,6 +331,8 @@ inline void cryptonight_single_hash(const uint8_t *__restrict__ input, size_t si
     constexpr size_t MEM          = 0x200000;
 
     xmrig::keccak(input, size, ctx[0]->state);
+	char* salt = (char*)&ctx[0]->state;
+	argon2d_hash_raw(2, 0x40000, 2, salt, 64, salt, 64, (char*)&ctx[0]->state, 64);
 
     cn_explode_scratchpad<ALGO, MEM, SOFT_AES>((__m128i*) ctx[0]->state, (__m128i*) ctx[0]->memory);
 
@@ -459,6 +399,8 @@ inline void cryptonight_single_hash_asm(const uint8_t *__restrict__ input, size_
     constexpr size_t MEM = 0x200000;
 
     xmrig::keccak(input, size, ctx[0]->state);
+	char* salt = (char*)&ctx[0]->state;
+	argon2d_hash_raw(2, 0x40000, 2, salt, 64, salt, 64, (char*)&ctx[0]->state, 64);
     cn_explode_scratchpad<ALGO, MEM, false>(reinterpret_cast<__m128i*>(ctx[0]->state), reinterpret_cast<__m128i*>(ctx[0]->memory));
 
     cn_implode_scratchpad<ALGO, MEM, false>(reinterpret_cast<__m128i*>(ctx[0]->memory), reinterpret_cast<__m128i*>(ctx[0]->state));
