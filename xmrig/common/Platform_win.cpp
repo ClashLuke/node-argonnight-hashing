@@ -28,8 +28,6 @@
 #include <windows.h>
 #include <uv.h>
 
-
-#include "log/Log.h"
 #include "Platform.h"
 #include "version.h"
 

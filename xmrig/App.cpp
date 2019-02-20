@@ -30,7 +30,6 @@
 #include "App.h"
 #include "common/Console.h"
 #include "common/cpu/Cpu.h"
-#include "common/log/Log.h"
 #include "common/Platform.h"
 #include "core/Config.h"
 #include "core/Controller.h"

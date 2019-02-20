@@ -29,7 +29,6 @@
 
 #include "common/net/Client.h"
 #include "common/net/Tls.h"
-#include "common/log/Log.h"
 
 
 #ifdef _MSC_VER

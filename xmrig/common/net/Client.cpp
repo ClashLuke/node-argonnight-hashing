@@ -37,7 +37,6 @@
 
 
 #include "common/interfaces/IClientListener.h"
-#include "common/log/Log.h"
 #include "common/net/Client.h"
 #include "net/JobResult.h"
 #include "rapidjson/document.h"

@@ -30,7 +30,6 @@
 #include "common/api/Httpd.h"
 #include "common/api/HttpReply.h"
 #include "common/api/HttpRequest.h"
-#include "common/log/Log.h"
 
 
 Httpd::Httpd(int port, const char *accessToken, bool IPv6, bool restricted) :

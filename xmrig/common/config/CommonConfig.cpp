@@ -54,7 +54,6 @@
 
 
 #include "common/config/CommonConfig.h"
-#include "common/log/Log.h"
 #include "donate.h"
 #include "rapidjson/document.h"
 #include "rapidjson/filewritestream.h"
@@ -101,10 +100,6 @@ void xmrig::CommonConfig::printAPI()
     if (apiPort() == 0) {
         return;
     }
-
-    Log::i()->text(isColors() ? GREEN_BOLD(" * ") WHITE_BOLD("%-13s") CYAN("%s:") CYAN_BOLD("%d")
-                              : " * %-13s%s:%d",
-                   "API BIND", isApiIPv6() ? "[::]" : "0.0.0.0", apiPort());
 #   endif
 }
 
@@ -112,22 +107,6 @@ void xmrig::CommonConfig::printAPI()
 void xmrig::CommonConfig::printPools()
 {
     for (size_t i = 0; i < m_activePools.size(); ++i) {
-        if (!isColors()) {
-            Log::i()->text(" * POOL #%-7zu%s variant=%s, TLS=%d",
-                           i + 1,
-                           m_activePools[i].url(),
-                           m_activePools[i].algorithm().variantName(),
-                           static_cast<int>(m_activePools[i].isTLS())
-                           );
-        }
-        else {
-            Log::i()->text(GREEN_BOLD(" * ") WHITE_BOLD("POOL #%-7zu") "\x1B[1;%dm%s\x1B[0m variant " WHITE_BOLD("%s"),
-                           i + 1,
-                           m_activePools[i].isTLS() ? 32 : 36,
-                           m_activePools[i].url(),
-                           m_activePools[i].algorithm().variantName()
-                           );
-        }
     }
 
 #   ifdef APP_DEBUG
@@ -151,10 +130,6 @@ void xmrig::CommonConfig::printVersions()
 #   elif defined(_MSC_VER)
     snprintf(buf, sizeof buf, "MSVC/%d", MSVC_VERSION);
 #   endif
-
-    Log::i()->text(isColors() ? GREEN_BOLD(" * ") WHITE_BOLD("%-13s") CYAN_BOLD("%s/%s") WHITE_BOLD(" %s")
-                              : " * %-13s%s/%s %s",
-                   "ABOUT", APP_NAME, APP_VERSION, buf);
 
 #   if defined(XMRIG_AMD_PROJECT)
 #   if CL_VERSION_2_0
@@ -190,10 +165,6 @@ void xmrig::CommonConfig::printVersions()
 #   ifndef XMRIG_NO_HTTPD
     length += snprintf(buf + length, (sizeof buf) - length, "microhttpd/%s ", MHD_get_version());
 #   endif
-
-    Log::i()->text(isColors() ? GREEN_BOLD(" * ") WHITE_BOLD("%-13slibuv/%s %s")
-                              : " * %-13slibuv/%s %s",
-                   "LIBS", uv_version_string(), buf);
 }
 
 

@@ -28,18 +28,10 @@
 #include "common/config/ConfigLoader.h"
 #include "common/cpu/Cpu.h"
 #include "common/interfaces/IControllerListener.h"
-#include "common/log/ConsoleLog.h"
-#include "common/log/FileLog.h"
-#include "common/log/Log.h"
 #include "common/Platform.h"
 #include "core/Config.h"
 #include "core/Controller.h"
 #include "net/Network.h"
-
-
-#ifdef HAVE_SYSLOG_H
-#   include "common/log/SysLog.h"
-#endif
 
 
 class xmrig::ControllerPrivate
@@ -106,24 +98,9 @@ int xmrig::Controller::init(int argc, char **argv)
     if (!d_ptr->config) {
         return 1;
     }
-
-    Log::init();
+    
     Platform::init(config()->userAgent());
     Platform::setProcessPriority(d_ptr->config->priority());
-
-    if (!config()->isBackground()) {
-        Log::add(new ConsoleLog(this));
-    }
-
-    if (config()->logFile()) {
-        Log::add(new FileLog(this, config()->logFile()));
-    }
-
-#   ifdef HAVE_SYSLOG_H
-    if (config()->isSyslog()) {
-        Log::add(new SysLog());
-    }
-#   endif
 
     d_ptr->network = new Network(this);
     return 0;
