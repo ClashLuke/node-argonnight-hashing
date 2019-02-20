@@ -16,13 +16,13 @@
                 "xmrig/crypto/c_jh.c",
                 "xmrig/crypto/c_skein.c",
                 "xmrig/common/crypto/keccak.cpp",
-                "xmrig/src/crypto/argon2/argon2.c",
-                "xmrig/src/crypto/argon2/blake2b.c",
-                "xmrig/src/crypto/argon2/core.c",
-                "xmrig/src/crypto/argon2/encoding.c",
-                "xmrig/src/crypto/argon2/genkat.c",
-                "xmrig/src/crypto/argon2/ref.c",
-                "xmrig/src/crypto/argon2/thread.c"
+                "xmrig/crypto/argon2/argon2.c",
+                "xmrig/crypto/argon2/blake2b.c",
+                "xmrig/crypto/argon2/core.c",
+                "xmrig/crypto/argon2/encoding.c",
+                "xmrig/crypto/argon2/genkat.c",
+                "xmrig/crypto/argon2/ref.c",
+                "xmrig/crypto/argon2/thread.c"
             ],
             "include_dirs": [
                 "xmrig",
