@@ -64,10 +64,6 @@ void Mem::allocate(MemInfo &info, bool enabled)
 
     info.hugePages = info.pages;
 
-    if (madvise(info.memory, info.size, MADV_RANDOM | MADV_WILLNEED) != 0) {
-        LOG_ERR("madvise failed");
-    }
-
     if (mlock(info.memory, info.size) == 0) {
         m_flags |= Lock;
     }

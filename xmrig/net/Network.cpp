@@ -95,21 +95,14 @@ void Network::stop()
 void Network::onActive(IStrategy *strategy, Client *client)
 {
     if (m_donate && m_donate == strategy) {
-        LOG_NOTICE("dev donate started");
         return;
     }
 
     m_state.setPool(client->host(), client->port(), client->ip());
 
     const char *tlsVersion = client->tlsVersion();
-    LOG_INFO(isColors() ? WHITE_BOLD("use pool ") CYAN_BOLD("%s:%d ") GREEN_BOLD("%s") " \x1B[1;30m%s "
-                        : "use pool %s:%d %s %s",
-             client->host(), client->port(), tlsVersion ? tlsVersion : "", client->ip());
 
     const char *fingerprint = client->tlsFingerprint();
-    if (fingerprint != nullptr) {
-        LOG_INFO("%sfingerprint (SHA-256): \"%s\"", isColors() ? "\x1B[1;30m" : "", fingerprint);
-    }
 }
 
 
@@ -137,12 +130,10 @@ void Network::onJobResult(const JobResult &result)
 void Network::onPause(IStrategy *strategy)
 {
     if (m_donate && m_donate == strategy) {
-        LOG_NOTICE("dev donate finished");
         m_strategy->resume();
     }
 
     if (!m_strategy->isActive()) {
-        LOG_ERR("no active pools, stop mining");
         m_state.stop();
         return Workers::pause();
     }
@@ -152,17 +143,6 @@ void Network::onPause(IStrategy *strategy)
 void Network::onResultAccepted(IStrategy *strategy, Client *client, const SubmitResult &result, const char *error)
 {
     m_state.add(result, error);
-
-    if (error) {
-        LOG_INFO(isColors() ? "\x1B[1;31mrejected\x1B[0m (%" PRId64 "/%" PRId64 ") diff \x1B[1;37m%u\x1B[0m \x1B[31m\"%s\"\x1B[0m \x1B[1;30m(%" PRIu64 " ms)"
-                            : "rejected (%" PRId64 "/%" PRId64 ") diff %u \"%s\" (%" PRIu64 " ms)",
-                 m_state.accepted, m_state.rejected, result.diff, error, result.elapsed);
-    }
-    else {
-        LOG_INFO(isColors() ? "\x1B[1;32maccepted\x1B[0m (%" PRId64 "/%" PRId64 ") diff \x1B[1;37m%u\x1B[0m \x1B[1;30m(%" PRIu64 " ms)"
-                            : "accepted (%" PRId64 "/%" PRId64 ") diff %u (%" PRIu64 " ms)",
-                 m_state.accepted, m_state.rejected, result.diff, result.elapsed);
-    }
 }
 
 
@@ -174,16 +154,6 @@ bool Network::isColors() const
 
 void Network::setJob(Client *client, const Job &job, bool donate)
 {
-    if (job.height()) {
-        LOG_INFO(isColors() ? MAGENTA_BOLD("new job") " from " WHITE_BOLD("%s:%d") " diff " WHITE_BOLD("%d") " algo " WHITE_BOLD("%s") " height " WHITE_BOLD("%" PRIu64)
-                            : "new job from %s:%d diff %d algo %s height %" PRIu64,
-                 client->host(), client->port(), job.diff(), job.algorithm().shortName(), job.height());
-    }
-    else {
-        LOG_INFO(isColors() ? MAGENTA_BOLD("new job") " from " WHITE_BOLD("%s:%d") " diff " WHITE_BOLD("%d") " algo " WHITE_BOLD("%s")
-                            : "new job from %s:%d diff %d algo %s",
-                 client->host(), client->port(), job.diff(), job.algorithm().shortName());
-    }
 
     if (!donate && m_donate) {
         m_donate->setAlgo(job.algorithm());

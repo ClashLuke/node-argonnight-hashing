@@ -267,15 +267,6 @@ void Pool::setAlgo(const xmrig::Algorithm &algorithm)
 #ifdef APP_DEBUG
 void Pool::print() const
 {
-    LOG_NOTICE("url:       %s", m_url.data());
-    LOG_DEBUG ("host:      %s", m_host.data());
-    LOG_DEBUG ("port:      %d", static_cast<int>(m_port));
-    LOG_DEBUG ("user:      %s", m_user.data());
-    LOG_DEBUG ("pass:      %s", m_password.data());
-    LOG_DEBUG ("rig-id     %s", m_rigId.data());
-    LOG_DEBUG ("algo:      %s", m_algorithm.name());
-    LOG_DEBUG ("nicehash:  %d", static_cast<int>(m_nicehash));
-    LOG_DEBUG ("keepAlive: %d", m_keepAlive);
 }
 #endif
 

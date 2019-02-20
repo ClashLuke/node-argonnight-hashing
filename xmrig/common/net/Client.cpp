@@ -161,7 +161,6 @@ void Client::tick(uint64_t now)
 {
     if (m_state == ConnectedState) {
         if (m_expire && now > m_expire) {
-            LOG_DEBUG_ERR("[%s] timeout", m_pool.url());
             close();
         }
         else if (m_keepAlive && now > m_keepAlive) {
@@ -383,11 +382,6 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
     if (m_jobs == 0) { // https://github.com/xmrig/xmrig/issues/459
         return false;
     }
-
-    if (!isQuiet()) {
-        LOG_WARN("[%s] duplicate job received, reconnect", m_pool.url());
-    }
-
     close();
     return false;
 }
@@ -423,8 +417,6 @@ bool Client::send(BIO *bio)
         return true;
     }
 
-    LOG_DEBUG("[%s] TLS send     (%d bytes)", m_pool.url(), static_cast<int>(buf.len));
-
     bool result = false;
     if (state() == ConnectedState && uv_is_writable(m_stream)) {
         result = uv_try_write(m_stream, &buf, 1) > 0;
@@ -432,9 +424,6 @@ bool Client::send(BIO *bio)
         if (!result) {
             close();
         }
-    }
-    else {
-        LOG_DEBUG_ERR("[%s] send failed, invalid state: %d", m_pool.url(), m_state);
     }
 
     (void) BIO_reset(bio);
@@ -461,14 +450,6 @@ bool Client::verifyAlgorithm(const xmrig::Algorithm &algorithm) const
     if (isQuiet()) {
         return false;
     }
-
-    if (algorithm.isValid()) {
-        LOG_ERR("Incompatible algorithm \"%s\" detected, reconnect", algorithm.name());
-    }
-    else {
-        LOG_ERR("Unknown/unsupported algorithm detected, reconnect");
-    }
-
     return false;
 }
 
@@ -486,9 +467,6 @@ int Client::resolve(const char *host)
 
     const int r = uv_getaddrinfo(uv_default_loop(), &m_resolver, Client::onResolved, host, nullptr, &m_hints);
     if (r) {
-        if (!isQuiet()) {
-            LOG_ERR("[%s:%u] getaddrinfo error: \"%s\"", host, m_pool.port(), uv_strerror(r));
-        }
         return 1;
     }
 
@@ -506,7 +484,6 @@ int64_t Client::send(const rapidjson::Document &doc)
 
     const size_t size = buffer.GetSize();
     if (size > (sizeof(m_sendBuf) - 2)) {
-        LOG_ERR("[%s] send failed: \"send buffer overflow: %zu > %zu\"", m_pool.url(), size, (sizeof(m_sendBuf) - 2));
         close();
         return -1;
     }
@@ -521,8 +498,7 @@ int64_t Client::send(const rapidjson::Document &doc)
 
 int64_t Client::send(size_t size)
 {
-    LOG_DEBUG("[%s] send (%d bytes): \"%s\"", m_pool.url(), size, m_sendBuf);
-
+   
 #   ifndef XMRIG_NO_TLS
     if (isTLS()) {
         if (!m_tls->send(m_sendBuf, size)) {
@@ -533,7 +509,6 @@ int64_t Client::send(size_t size)
 #   endif
     {
         if (state() != ConnectedState || !uv_is_writable(m_stream)) {
-            LOG_DEBUG_ERR("[%s] send failed, invalid state: %d", m_pool.url(), m_state);
             return -1;
         }
 
@@ -672,21 +647,14 @@ void Client::parse(char *line, size_t len)
 
     line[len - 1] = '\0';
 
-    LOG_DEBUG("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
-
+    
     if (len < 32 || line[0] != '{') {
-        if (!isQuiet()) {
-            LOG_ERR("[%s] JSON decode failed", m_pool.url());
-        }
 
         return;
     }
 
     rapidjson::Document doc;
     if (doc.ParseInsitu(line).HasParseError()) {
-        if (!isQuiet()) {
-            LOG_ERR("[%s] JSON decode failed: \"%s\"", m_pool.url(), rapidjson::GetParseError_En(doc.GetParseError()));
-        }
 
         return;
     }
@@ -735,9 +703,6 @@ void Client::parseExtensions(const rapidjson::Value &value)
 void Client::parseNotification(const char *method, const rapidjson::Value &params, const rapidjson::Value &error)
 {
     if (error.IsObject()) {
-        if (!isQuiet()) {
-            LOG_ERR("[%s] error: \"%s\", code: %d", m_pool.url(), error["message"].GetString(), error["code"].GetInt());
-        }
         return;
     }
 
@@ -753,8 +718,6 @@ void Client::parseNotification(const char *method, const rapidjson::Value &param
 
         return;
     }
-
-    LOG_WARN("[%s] unsupported method: \"%s\"", m_pool.url(), method);
 }
 
 
@@ -768,9 +731,6 @@ void Client::parseResponse(int64_t id, const rapidjson::Value &result, const rap
             it->second.done();
             m_listener->onResultAccepted(this, it->second, message);
             m_results.erase(it);
-        }
-        else if (!isQuiet()) {
-            LOG_ERR("[%s] error: \"%s\", code: %d", m_pool.url(), message, error["code"].GetInt());
         }
 
         if (isCriticalError(message)) {
@@ -787,9 +747,6 @@ void Client::parseResponse(int64_t id, const rapidjson::Value &result, const rap
     if (id == 1) {
         int code = -1;
         if (!parseLogin(result, &code)) {
-            if (!isQuiet()) {
-                LOG_ERR("[%s] login error code: %d", m_pool.url(), code);
-            }
 
             close();
             return;
@@ -870,8 +827,7 @@ void Client::reconnect()
 
 void Client::setState(SocketState state)
 {
-    LOG_DEBUG("[%s] state: \"%s\"", m_pool.url(), states[state]);
-
+  
     if (m_state == state) {
         return;
     }
@@ -922,9 +878,6 @@ void Client::onConnect(uv_connect_t *req, int status)
     }
 
     if (status < 0) {
-        if (!client->isQuiet()) {
-            LOG_ERR("[%s] connect error: \"%s\"", client->m_pool.url(), uv_strerror(status));
-        }
 
         delete req;
         client->close();
@@ -950,9 +903,6 @@ void Client::onRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
     }
 
     if (nread < 0) {
-        if (!client->isQuiet()) {
-            LOG_ERR("[%s] read error: \"%s\"", client->m_pool.url(), uv_strerror((int) nread));
-        }
 
         client->close();
         return;
@@ -972,8 +922,7 @@ void Client::onRead(uv_stream_t *stream, ssize_t nread, const uv_buf_t *buf)
 
 #   ifndef XMRIG_NO_TLS
     if (client->isTLS()) {
-        LOG_DEBUG("[%s] TLS received (%d bytes)", client->m_pool.url(), static_cast<int>(nread));
-
+       
         client->m_tls->read(client->m_recvBuf.base, client->m_recvBufPos);
         client->m_recvBufPos = 0;
     }
@@ -998,9 +947,6 @@ void Client::onResolved(uv_getaddrinfo_t *req, int status, struct addrinfo *res)
     }
 
     if (status < 0) {
-        if (!client->isQuiet()) {
-            LOG_ERR("[%s] DNS error: \"%s\"", client->m_pool.url(), uv_strerror(status));
-        }
 
         return client->reconnect();
     }
@@ -1022,9 +968,6 @@ void Client::onResolved(uv_getaddrinfo_t *req, int status, struct addrinfo *res)
     }
 
     if (ipv4.empty() && ipv6.empty()) {
-        if (!client->isQuiet()) {
-            LOG_ERR("[%s] DNS error: \"No IPv4 (A) or IPv6 (AAAA) records found\"", client->m_pool.url());
-        }
 
         uv_freeaddrinfo(res);
         return client->reconnect();

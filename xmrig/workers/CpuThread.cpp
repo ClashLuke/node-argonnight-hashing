@@ -254,14 +254,6 @@ xmrig::IThread::Multiway xmrig::CpuThread::multiway(AlgoVariant av)
 #ifdef APP_DEBUG
 void xmrig::CpuThread::print() const
 {
-    LOG_DEBUG(GREEN_BOLD("CPU thread:   ") " index " WHITE_BOLD("%zu") ", multiway " WHITE_BOLD("%d") ", av " WHITE_BOLD("%d") ",",
-              index(), static_cast<int>(multiway()), static_cast<int>(m_av));
-
-#   ifndef XMRIG_NO_ASM
-    LOG_DEBUG("               assembly: %s, affine_to_cpu: %" PRId64, Asm::toString(m_assembly), affinity());
-#   else
-    LOG_DEBUG("               affine_to_cpu: %" PRId64, affinity());
-#   endif
 }
 #endif
 

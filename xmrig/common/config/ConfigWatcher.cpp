@@ -77,13 +77,11 @@ void xmrig::ConfigWatcher::queueUpdate()
 
 void xmrig::ConfigWatcher::reload()
 {
-    LOG_WARN("\"%s\" was changed, reloading configuration", m_path.data());
-
+    
     IConfig *config = m_creator->create();
     ConfigLoader::loadFromFile(config, m_path.data());
 
     if (!config->finalize()) {
-        LOG_ERR("reloading failed");
 
         delete config;
         return;

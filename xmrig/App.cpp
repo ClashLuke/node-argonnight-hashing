@@ -105,7 +105,6 @@ int App::exec()
     Summary::print(m_controller);
 
     if (m_controller->config()->isDryRun()) {
-        LOG_NOTICE("OK");
         release();
 
         return 0;
@@ -149,7 +148,6 @@ void App::onConsoleCommand(char command)
     case 'p':
     case 'P':
         if (Workers::isEnabled()) {
-            LOG_INFO(m_controller->config()->isColors() ? "\x1B[01;33mpaused\x1B[0m, press \x1B[01;35mr\x1B[0m to resume" : "paused, press 'r' to resume");
             Workers::setEnabled(false);
         }
         break;
@@ -157,13 +155,11 @@ void App::onConsoleCommand(char command)
     case 'r':
     case 'R':
         if (!Workers::isEnabled()) {
-            LOG_INFO(m_controller->config()->isColors() ? "\x1B[01;32mresumed" : "resumed");
             Workers::setEnabled(true);
         }
         break;
 
     case 3:
-        LOG_WARN("Ctrl+C received, exiting");
         close();
         break;
 
@@ -189,23 +185,6 @@ void App::release()
 
 void App::onSignal(uv_signal_t *handle, int signum)
 {
-    switch (signum)
-    {
-    case SIGHUP:
-        LOG_WARN("SIGHUP received, exiting");
-        break;
-
-    case SIGTERM:
-        LOG_WARN("SIGTERM received, exiting");
-        break;
-
-    case SIGINT:
-        LOG_WARN("SIGINT received, exiting");
-        break;
-
-    default:
-        break;
-    }
 
     uv_signal_stop(handle);
     m_self->close();

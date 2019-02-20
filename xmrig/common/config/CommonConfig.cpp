@@ -110,11 +110,9 @@ void xmrig::CommonConfig::printPools()
     }
 
 #   ifdef APP_DEBUG
-    LOG_NOTICE("POOLS --------------------------------------------------------------------");
     for (const Pool &pool : m_activePools) {
         pool.print();
     }
-    LOG_NOTICE("--------------------------------------------------------------------------");
 #   endif
 }
 
@@ -197,7 +195,6 @@ bool xmrig::CommonConfig::save()
     uv_fs_close(uv_default_loop(), &req, fd, nullptr);
     uv_fs_req_cleanup(&req);
 
-    LOG_NOTICE("configuration saved to: \"%s\"", m_fileName.data());
     return true;
 }
 

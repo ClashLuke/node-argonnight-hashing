@@ -136,11 +136,9 @@ void Workers::setJob(const Job &job, bool donate)
 void Workers::start(xmrig::Controller *controller)
 {
 #   ifdef APP_DEBUG
-    LOG_NOTICE("THREADS ------------------------------------------------------------------");
     for (const xmrig::IThread *thread : controller->config()->threads()) {
         thread->print();
     }
-    LOG_NOTICE("--------------------------------------------------------------------------");
 #   endif
 
 #   ifndef XMRIG_NO_ASM
@@ -265,7 +263,6 @@ void Workers::onReady(void *arg)
     handle->setWorker(worker);
 
     if (!worker->selfTest()) {
-        LOG_ERR("thread %zu error: \"hash self-test failed\".", handle->worker()->id());
 
         return;
     }
@@ -323,13 +320,11 @@ void Workers::start(IWorker *worker)
         const size_t memory  = m_status.ways * 0x200000 / 1024;
 
         if (m_status.colors) {
-            LOG_INFO(GREEN_BOLD("READY (CPU)") " threads " CYAN_BOLD("%zu(%zu)") " huge pages %s%zu/%zu %1.0f%%\x1B[0m memory " CYAN_BOLD("%zu KB") "",
-                     m_status.threads, m_status.ways,
+                      m_status.threads, m_status.ways,
                      (m_status.hugePages == m_status.pages ? "\x1B[1;32m" : (m_status.hugePages == 0 ? "\x1B[1;31m" : "\x1B[1;33m")),
                      m_status.hugePages, m_status.pages, percent, memory);
         }
         else {
-            LOG_INFO("READY (CPU) threads %zu(%zu) huge pages %zu/%zu %1.0f%% memory %zu KB",
                      m_status.threads, m_status.ways, m_status.hugePages, m_status.pages, percent, memory);
         }
     }

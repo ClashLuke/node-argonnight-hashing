@@ -91,9 +91,6 @@ char *Platform::createUserAgent()
 
 bool Platform::setThreadAffinity(uint64_t cpu_id)
 {
-    if (cpu_id >= 64) {
-        LOG_ERR("Unable to set affinity. Windows supports only affinity up to 63.");
-    }
 
     return SetThreadAffinityMask(GetCurrentThread(), 1ULL << cpu_id) != 0;
 }

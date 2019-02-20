@@ -52,12 +52,5 @@ void App::background()
 
     i = setsid();
 
-    if (i < 0) {
-        LOG_ERR("setsid() failed (errno = %d)", errno);
-    }
-
     i = chdir("/");
-    if (i < 0) {
-        LOG_ERR("chdir() failed (errno = %d)", errno);
-    }
 }

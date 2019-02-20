@@ -31,7 +31,6 @@
 
 SysLog::SysLog()
 {
-    openlog(APP_ID, LOG_PID, LOG_USER);
 }
 
 
@@ -43,5 +42,4 @@ void SysLog::message(Level level, const char *fmt, va_list args)
 
 void SysLog::text(const char *fmt, va_list args)
 {
-    vsyslog(LOG_INFO, fmt, args);
 }

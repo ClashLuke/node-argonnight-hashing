@@ -75,10 +75,6 @@ bool Httpd::start()
 #   endif
 
     m_daemon = MHD_start_daemon(flags, m_port, nullptr, nullptr, &Httpd::handler, this, MHD_OPTION_END);
-    if (!m_daemon) {
-        LOG_ERR("HTTP Daemon failed to start.");
-        return false;
-    }
 
 #   if MHD_VERSION >= 0x00093900
     uv_timer_start(&m_timer, Httpd::onTimer, kIdleInterval, kIdleInterval);
